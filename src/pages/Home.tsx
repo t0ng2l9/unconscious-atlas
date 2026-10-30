@@ -4,6 +4,7 @@ import { concepts, lineMeta, type Line } from '../data/concepts'
 import { essays } from '../data/essays'
 import { events } from '../data/timeline'
 import { glossary } from '../data/glossary'
+import { figures } from '../data/figures'
 import { ConceptCard } from '../components/ConceptCard'
 import { Label } from '../components/primitives'
 import TraceCanvas, { type TracePoint } from '../components/TraceCanvas'
@@ -274,41 +275,60 @@ export default function Home() {
       </section>
 
       {/* ================= NEW SECTIONS ================= */}
-      <section className="mt-24 grid gap-px border-t border-line pt-14 md:grid-cols-2 md:gap-8">
-        <Link
-          to="/timeline"
-          className="group flex flex-col justify-between gap-8 border border-line p-6 transition-colors hover:border-ink md:p-8"
-        >
-          <div>
-            <Label>Chronology</Label>
-            <h2 className="mt-3 font-display text-2xl tracking-tight text-ink transition-colors group-hover:text-crimson">
-              编年：一条缝合线的时间
-            </h2>
-            <p className="mt-3 max-w-[42ch] text-sm leading-relaxed text-mute">
-              从 1641 到 1981，收那些改变了「无意识可以被说成什么」的时刻——大多不是理论推演，而是战地、决裂和某个具体下午推动出来的。
-            </p>
-          </div>
-          <span className="font-mono text-xs tracking-wider text-mute-soft">
-            {String(events.length).padStart(2, '0')} events →
-          </span>
-        </Link>
-        <Link
-          to="/glossary"
-          className="group flex flex-col justify-between gap-8 border border-line p-6 transition-colors hover:border-ink md:p-8"
-        >
-          <div>
-            <Label>Glossary</Label>
-            <h2 className="mt-3 font-display text-2xl tracking-tight text-ink transition-colors group-hover:text-crimson">
-              术语：词是入口，不是答案
-            </h2>
-            <p className="mt-3 max-w-[42ch] text-sm leading-relaxed text-mute">
-              同一个词在两条线上常常是两件事。每个术语给一句话释义，再加一段「为什么重要」，并连回对应档案。
-            </p>
-          </div>
-          <span className="font-mono text-xs tracking-wider text-mute-soft">
-            {String(glossary.length).padStart(2, '0')} terms →
-          </span>
-        </Link>
+      <section className="mt-24 border-t border-line pt-14">
+        <div className="grid gap-px bg-line md:grid-cols-3">
+          <Link
+            to="/figures"
+            className="group flex flex-col justify-between gap-8 bg-paper p-6 transition-colors hover:bg-[color-mix(in_srgb,var(--color-paper)_55%,white)] md:p-8"
+          >
+            <div>
+              <Label>Figures</Label>
+              <h2 className="mt-3 font-display text-2xl tracking-tight text-ink transition-colors group-hover:text-crimson">
+                人物：弗洛伊德之外
+              </h2>
+              <p className="mt-3 max-w-[40ch] text-sm leading-relaxed text-mute">
+                尼采、卡夫卡、马尔库塞、阿尔都塞、德勒兹、巴特勒——{figures.length} 位人物，有的与弗洛伊德争辩，有的压根不承认自己和他有关系。
+              </p>
+            </div>
+            <span className="font-mono text-xs tracking-wider text-mute-soft">
+              {String(figures.length).padStart(2, '0')} figures →
+            </span>
+          </Link>
+          <Link
+            to="/timeline"
+            className="group flex flex-col justify-between gap-8 bg-paper p-6 transition-colors hover:bg-[color-mix(in_srgb,var(--color-paper)_55%,white)] md:p-8"
+          >
+            <div>
+              <Label>Chronology</Label>
+              <h2 className="mt-3 font-display text-2xl tracking-tight text-ink transition-colors group-hover:text-crimson">
+                编年：一条缝合线的时间
+              </h2>
+              <p className="mt-3 max-w-[40ch] text-sm leading-relaxed text-mute">
+                从 1641 到 1981，收那些改变了「无意识可以被说成什么」的时刻——大多不是理论推演，而是战地、决裂和某个具体下午推动出来的。
+              </p>
+            </div>
+            <span className="font-mono text-xs tracking-wider text-mute-soft">
+              {String(events.length).padStart(2, '0')} events →
+            </span>
+          </Link>
+          <Link
+            to="/glossary"
+            className="group flex flex-col justify-between gap-8 bg-paper p-6 transition-colors hover:bg-[color-mix(in_srgb,var(--color-paper)_55%,white)] md:p-8"
+          >
+            <div>
+              <Label>Glossary</Label>
+              <h2 className="mt-3 font-display text-2xl tracking-tight text-ink transition-colors group-hover:text-crimson">
+                术语：词是入口，不是答案
+              </h2>
+              <p className="mt-3 max-w-[40ch] text-sm leading-relaxed text-mute">
+                同一个词在两条线上常常是两件事。每个术语给一句话释义，再加一段「为什么重要」，并连回对应档案。
+              </p>
+            </div>
+            <span className="font-mono text-xs tracking-wider text-mute-soft">
+              {String(glossary.length).padStart(2, '0')} terms →
+            </span>
+          </Link>
+        </div>
       </section>
 
       {/* ================= CLOSING THESIS ================= */}
@@ -321,12 +341,13 @@ export default function Home() {
             它解释人<span className="text-crimson">如何在自己解释自己的时候出错</span>。
           </blockquote>
         </div>
-        <div className="mt-12 grid grid-cols-2 gap-px bg-line-soft border border-line-soft md:grid-cols-5">
+        <div className="mt-12 grid grid-cols-2 gap-px bg-line-soft border border-line-soft md:grid-cols-6">
           {[
             ['档案', String(concepts.length)],
+            ['人物', String(figures.length)],
             ['术语', String(glossary.length)],
             ['文章', String(essays.length)],
-            ['跨度', '1641—1976'],
+            ['跨度', '1641—2026'],
             ['主轴', '无意识'],
           ].map(([k, v]) => (
             <div key={k} className="bg-paper p-5">

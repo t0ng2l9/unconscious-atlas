@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 const links = [
   { to: '/', label: '首页', en: 'Index' },
   { to: '/archive', label: '档案', en: 'Atlas' },
+  { to: '/figures', label: '人物', en: 'Figures' },
   { to: '/timeline', label: '编年', en: 'Chronology' },
   { to: '/glossary', label: '术语', en: 'Glossary' },
   { to: '/essays', label: '文章', en: 'Essays' },

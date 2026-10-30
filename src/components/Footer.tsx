@@ -24,6 +24,9 @@ export default function Footer() {
           <Link to="/archive?line=crossing" className="text-sm text-mute transition-colors hover:text-crimson">
             交汇点
           </Link>
+          <Link to="/figures" className="text-sm text-mute transition-colors hover:text-crimson">
+            人物
+          </Link>
           <Link to="/timeline" className="text-sm text-mute transition-colors hover:text-crimson">
             编年
           </Link>
