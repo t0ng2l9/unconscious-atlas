@@ -9,10 +9,10 @@ export default function Essays() {
         <div>
           <Label>Essays · 长文</Label>
           <h1 className="mt-5 font-display text-4xl leading-[1.12] tracking-tight text-ink md:text-5xl">
-            三篇文章
+            七篇文章
           </h1>
-          <p className="mt-6 max-w-[46ch] leading-relaxed text-mute">
-            档案让知识变得稠密，文章让观点变得可被反驳。三篇长文各回答一个问题：近代哲学为什么必须逐出无意识？无意识如何获得语法？谁在替主体说话？
+          <p className="mt-6 max-w-[46ch] leading-relaxed text-mute [text-wrap:pretty]">
+            档案让知识变得稠密，文章让观点变得可被反驳。前三篇沿时间轴展开，后四篇转向理论的裂缝、日常经验、战争，以及精神分析在中国的处境。
           </p>
         </div>
         <div className="self-end border-l border-line pl-6 md:pl-8">

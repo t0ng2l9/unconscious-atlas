@@ -1,6 +1,9 @@
 import { Link, useSearchParams } from 'react-router-dom'
 import { useEffect, useMemo, useState } from 'react'
 import { concepts, lineMeta, type Line } from '../data/concepts'
+import { essays } from '../data/essays'
+import { events } from '../data/timeline'
+import { glossary } from '../data/glossary'
 import { ConceptCard } from '../components/ConceptCard'
 import { Label } from '../components/primitives'
 import TraceCanvas, { type TracePoint } from '../components/TraceCanvas'
@@ -236,37 +239,76 @@ export default function Home() {
         <div className="grid gap-10 md:grid-cols-[7rem_1fr]">
           <Label className="pt-2">文章</Label>
           <div>
-            <h2 className="font-display text-3xl leading-tight tracking-tight text-ink md:text-4xl">
-              三条线索，三篇文章。
+            <h2 className="font-display text-3xl leading-tight tracking-tight text-ink [text-wrap:balance] md:text-4xl">
+              七条线索，七篇文章。
             </h2>
-            <p className="mt-5 max-w-[56ch] leading-relaxed text-mute">
-              档案负责密度，文章负责论证。三篇长文沿着时间轴展开：被赶出客厅的房间、无意识如何获得语法、以及「谁在说话」的两条路线之争。
+            <p className="mt-5 max-w-[56ch] leading-relaxed text-mute [text-wrap:pretty]">
+              档案负责密度，文章负责论证。前三篇沿时间轴展开：被赶出客厅的房间、无意识如何获得语法、「谁在说话」的路线之争；后四篇转向理论的裂缝与它在中国的处境。
             </p>
             <ul className="mt-10 divide-y divide-line-soft border-y border-line-soft">
-              {[
-                ['I', '在笛卡尔之后：被赶出客厅的房间', 'prehistory', '1641 – 1818'],
-                ['II', '无意识如何获得一个声音', 'listening', '1900 – 1923'],
-                ['III', '谁在说话？拉康、福柯与两条路线之争', 'french-turn', '1964 – 1976'],
-              ].map(([num, title, slug, period], idx) => (
-                <li key={slug}>
+              {essays.map((e) => (
+                <li key={e.slug}>
                   <Link
-                    to={`/essays/${slug}`}
-                    className="group grid gap-2 py-6 transition-colors md:grid-cols-[3rem_1fr_auto] md:items-baseline md:gap-8"
+                    to={`/essays/${e.slug}`}
+                    className="group grid gap-2 py-5 transition-colors md:grid-cols-[3rem_1fr_auto] md:items-baseline md:gap-8"
                   >
                     <span className="font-serif-en text-2xl italic text-mute-soft transition-colors group-hover:text-crimson">
-                      {num}
+                      {e.index}
                     </span>
                     <span className="font-display text-xl leading-snug text-ink transition-colors group-hover:text-crimson md:text-2xl">
-                      {title}
+                      {e.title}
                     </span>
-                    <span className="label-mono text-mute-soft">{period}</span>
-                    <span className="sr-only">阅读第 {idx + 1} 篇</span>
+                    <span className="label-mono text-mute-soft">{e.period}</span>
                   </Link>
                 </li>
               ))}
             </ul>
+            <Link
+              to="/essays"
+              className="mt-6 inline-flex items-center gap-2 text-sm text-mute transition-colors hover:text-crimson"
+            >
+              全部 {essays.length} 篇 →
+            </Link>
           </div>
         </div>
+      </section>
+
+      {/* ================= NEW SECTIONS ================= */}
+      <section className="mt-24 grid gap-px border-t border-line pt-14 md:grid-cols-2 md:gap-8">
+        <Link
+          to="/timeline"
+          className="group flex flex-col justify-between gap-8 border border-line p-6 transition-colors hover:border-ink md:p-8"
+        >
+          <div>
+            <Label>Chronology</Label>
+            <h2 className="mt-3 font-display text-2xl tracking-tight text-ink transition-colors group-hover:text-crimson">
+              编年：一条缝合线的时间
+            </h2>
+            <p className="mt-3 max-w-[42ch] text-sm leading-relaxed text-mute">
+              从 1641 到 1981，收那些改变了「无意识可以被说成什么」的时刻——大多不是理论推演，而是战地、决裂和某个具体下午推动出来的。
+            </p>
+          </div>
+          <span className="font-mono text-xs tracking-wider text-mute-soft">
+            {String(events.length).padStart(2, '0')} events →
+          </span>
+        </Link>
+        <Link
+          to="/glossary"
+          className="group flex flex-col justify-between gap-8 border border-line p-6 transition-colors hover:border-ink md:p-8"
+        >
+          <div>
+            <Label>Glossary</Label>
+            <h2 className="mt-3 font-display text-2xl tracking-tight text-ink transition-colors group-hover:text-crimson">
+              术语：词是入口，不是答案
+            </h2>
+            <p className="mt-3 max-w-[42ch] text-sm leading-relaxed text-mute">
+              同一个词在两条线上常常是两件事。每个术语给一句话释义，再加一段「为什么重要」，并连回对应档案。
+            </p>
+          </div>
+          <span className="font-mono text-xs tracking-wider text-mute-soft">
+            {String(glossary.length).padStart(2, '0')} terms →
+          </span>
+        </Link>
       </section>
 
       {/* ================= CLOSING THESIS ================= */}
@@ -279,10 +321,11 @@ export default function Home() {
             它解释人<span className="text-crimson">如何在自己解释自己的时候出错</span>。
           </blockquote>
         </div>
-        <div className="mt-12 grid grid-cols-2 gap-px bg-line-soft border border-line-soft md:grid-cols-4">
+        <div className="mt-12 grid grid-cols-2 gap-px bg-line-soft border border-line-soft md:grid-cols-5">
           {[
-            ['档案', '12'],
-            ['文章', '03'],
+            ['档案', String(concepts.length)],
+            ['术语', String(glossary.length)],
+            ['文章', String(essays.length)],
             ['跨度', '1641—1976'],
             ['主轴', '无意识'],
           ].map(([k, v]) => (

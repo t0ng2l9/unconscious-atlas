@@ -7,6 +7,8 @@ import Archive from './pages/Archive'
 import ConceptPage from './pages/ConceptPage'
 import Essays from './pages/Essays'
 import EssayPage from './pages/EssayPage'
+import Timeline from './pages/Timeline'
+import Glossary from './pages/Glossary'
 
 function ScrollReset() {
   const { pathname } = useLocation()
@@ -28,6 +30,8 @@ export default function App() {
           <Route path="/archive/:id" element={<ConceptPage />} />
           <Route path="/essays" element={<Essays />} />
           <Route path="/essays/:slug" element={<EssayPage />} />
+          <Route path="/timeline" element={<Timeline />} />
+          <Route path="/glossary" element={<Glossary />} />
           <Route path="*" element={<Home />} />
         </Routes>
       </main>

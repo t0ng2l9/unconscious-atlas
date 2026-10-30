@@ -24,15 +24,27 @@ export default function Footer() {
           <Link to="/archive?line=crossing" className="text-sm text-mute transition-colors hover:text-crimson">
             交汇点
           </Link>
+          <Link to="/timeline" className="text-sm text-mute transition-colors hover:text-crimson">
+            编年
+          </Link>
+          <Link to="/glossary" className="text-sm text-mute transition-colors hover:text-crimson">
+            术语表
+          </Link>
         </div>
         <div className="flex flex-col gap-2">
           <span className="label-mono text-mute-soft">文章</span>
           <Link to="/essays" className="text-sm text-mute transition-colors hover:text-crimson">
             全部文章
           </Link>
+          <Link to="/essays/feminine" className="text-sm text-mute transition-colors hover:text-crimson">
+            弗洛伊德与女性
+          </Link>
+          <Link to="/essays/china" className="text-sm text-mute transition-colors hover:text-crimson">
+            精神分析与中国
+          </Link>
           <span className="mt-4 label-mono text-mute-soft">Edition</span>
           <span className="font-mono text-xs tracking-wider text-mute">
-            No. 01 · 个人作品
+            No. 02 · 个人作品
           </span>
         </div>
       </div>

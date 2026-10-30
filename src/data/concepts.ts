@@ -1,5 +1,6 @@
-export type Line = 'philosophy' | 'psychoanalysis' | 'crossing'
+import { enrichment } from './enrichment'
 
+export type Line = 'philosophy' | 'psychoanalysis' | 'crossing'
 export type Era =
   | 'antiquity'
   | 'early-modern'
@@ -32,6 +33,13 @@ export interface Concept {
    * Each entry is shown as a before/after pair.
    */
   lever: { before: string; after: string }
+  /**
+   * Filled in from enrichment.ts after the array literal is defined, so the
+   * authoring records below do not have to repeat them. Optional by design.
+   */
+  quote?: { text: string; source: string }
+  furtherReading?: { title: string; author: string; note: string }[]
+  keywords?: string[]
   works: { title: string; year: string }[]
   refs: ConceptRef[]
 }
@@ -445,5 +453,16 @@ export const concepts: Concept[] = [
     ],
   },
 ]
+
+// Merge the quotable line, reading list and keywords from enrichment.ts.
+// Done here (rather than by hand in every record) so the two files can grow
+// independently; enrichment imports only the *type*, so there is no cycle.
+for (const c of concepts) {
+  const extra = enrichment[c.id]
+  if (!extra) continue
+  c.quote = extra.quote
+  c.furtherReading = extra.furtherReading
+  c.keywords = extra.keywords
+}
 
 export const getConcept = (id: string) => concepts.find((c) => c.id === id)

@@ -89,11 +89,11 @@ export default function ConceptPage() {
       </section>
 
       {/* body prose */}
-      <section className="grid gap-10 py-14 md:grid-cols-[7rem_1fr] md:gap-16">
+      <section className="grid gap-10 py-14 md:grid-cols-[7rem_minmax(0,1fr)_15rem] md:gap-12 lg:gap-16">
         <div className="pt-1">
           <Label>释文</Label>
         </div>
-        <div className="max-w-[62ch]">
+        <div className="max-w-[62ch] md:max-w-none">
           {concept.body.map((p, i) => (
             <p
               key={i}
@@ -103,7 +103,59 @@ export default function ConceptPage() {
             </p>
           ))}
         </div>
+
+        {/* pull quote + keywords sit beside the prose on wide screens */}
+        <aside className="md:sticky md:top-24 md:h-fit">
+          {concept.quote && (
+            <blockquote className="border-l-2 border-crimson pl-5">
+              <p className="font-display text-lg leading-[1.7] tracking-tight text-ink">
+                {concept.quote.text}
+              </p>
+              <footer className="mt-3 label-mono text-mute-soft">{concept.quote.source}</footer>
+            </blockquote>
+          )}
+          {concept.keywords && concept.keywords.length > 0 && (
+            <div className="mt-8">
+              <Label>关键词</Label>
+              <ul className="mt-3 flex flex-wrap gap-1.5">
+                {concept.keywords.map((k) => (
+                  <li
+                    key={k}
+                    className="border border-line-soft px-2.5 py-1 text-xs text-mute"
+                  >
+                    {k}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </aside>
       </section>
+
+      {/* further reading */}
+      {concept.furtherReading && concept.furtherReading.length > 0 && (
+        <section className="border-t border-line py-14 md:grid md:grid-cols-[7rem_1fr] md:gap-16">
+          <Label className="pt-1">延伸阅读</Label>
+          <ul className="mt-4 grid gap-px bg-line md:mt-0 md:grid-cols-2">
+            {concept.furtherReading.map((b, idx) => {
+              // an odd number of cards would leave a grey gap in the 2-col grid
+              const isLastOdd =
+                concept.furtherReading!.length % 2 === 1 &&
+                idx === concept.furtherReading!.length - 1
+              return (
+                <li
+                  key={b.title}
+                  className={`flex flex-col gap-2 bg-paper p-6 ${isLastOdd ? 'md:col-span-2' : ''}`}
+                >
+                  <p className="font-display text-lg leading-snug text-ink">{b.title}</p>
+                  <p className="label-mono text-mute-soft">{b.author}</p>
+                  <p className="text-sm leading-relaxed text-mute">{b.note}</p>
+                </li>
+              )
+            })}
+          </ul>
+        </section>
+      )}
 
       {/* the lever */}
       <section className="grid gap-8 border-t border-line py-14 md:grid-cols-[7rem_1fr]">

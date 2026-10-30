@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 const links = [
   { to: '/', label: '首页', en: 'Index' },
   { to: '/archive', label: '档案', en: 'Atlas' },
+  { to: '/timeline', label: '编年', en: 'Chronology' },
+  { to: '/glossary', label: '术语', en: 'Glossary' },
   { to: '/essays', label: '文章', en: 'Essays' },
 ]
 
@@ -41,29 +43,29 @@ export default function Nav() {
           : 'border-transparent bg-transparent'
       }`}
     >
-      <div className="mx-auto flex h-16 max-w-[1400px] items-center justify-between px-5 md:px-10">
-        <Link to="/" className="group flex items-baseline gap-3">
+      <div className="mx-auto flex h-16 max-w-[1400px] items-center justify-between gap-4 px-4 md:px-10">
+        <Link to="/" className="group flex shrink-0 items-baseline gap-3">
           <span className="font-display text-[1.05rem] tracking-wide text-ink">
             无意识图谱
           </span>
-          <span className="label-mono hidden text-mute-soft transition-colors group-hover:text-crimson sm:inline">
+          <span className="label-mono hidden text-mute-soft transition-colors group-hover:text-crimson lg:inline">
             Unbewusstes Atlas
           </span>
         </Link>
 
-        <nav className="flex items-center gap-6 md:gap-9" aria-label="主导航">
+        <nav className="-mr-1 flex items-center gap-3.5 sm:gap-5 md:gap-6 xl:gap-8" aria-label="主导航">
           {links.map((l) => {
             const active = l.to === '/' ? pathname === '/' : pathname.startsWith(l.to)
             return (
               <Link
                 key={l.to}
                 to={l.to}
-                className={`group relative flex items-baseline gap-2 pb-1 text-[0.95rem] transition-colors duration-300 ${
+                className={`group relative flex items-baseline gap-2 pb-1 text-[0.88rem] transition-colors duration-300 md:text-[0.95rem] ${
                   active ? 'text-crimson' : 'text-mute hover:text-ink'
                 }`}
               >
                 <span>{l.label}</span>
-                <span className="label-mono hidden text-[0.6rem] text-mute-soft md:inline">
+                <span className="label-mono hidden text-[0.6rem] text-mute-soft xl:inline">
                   {l.en}
                 </span>
                 <span
