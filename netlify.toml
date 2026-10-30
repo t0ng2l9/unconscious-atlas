@@ -1,0 +1,9 @@
+# Netlify SPA fallback — deep links like /archive/dream must reach the SPA.
+[build]
+  command = "pnpm build"
+  publish = "dist"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

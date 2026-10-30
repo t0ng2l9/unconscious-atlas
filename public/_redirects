@@ -1,0 +1,4 @@
+# Cloudflare Pages SPA fallback.
+# BrowserRouter needs every unknown path to serve index.html so that
+# deep links such as /archive/dream and /essays/french-turn work on refresh.
+/*    /index.html   200
