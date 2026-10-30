@@ -1,7 +1,7 @@
 name: Deploy to Cloudflare Pages
 
-# Replaces the manual drag-and-drop upload: every push to main builds the
-# site and publishes dist/ to the existing `unconscious-atlas` Pages project.
+# Every push to main builds the site and publishes dist/ to the existing
+# `unconscious-atlas` Pages project. Replaces manual drag-and-drop uploads.
 
 on:
   push:
@@ -39,9 +39,14 @@ jobs:
       - name: Build
         run: pnpm build
 
+      # wrangler is installed with npm on purpose: wrangler-action defaults to
+      # pnpm here, which collides with the pnpm set up above (the action then
+      # fails with `process .../setup-pnpm/node_modules/.bin/pnpm` exit 1).
+      - name: Install wrangler
+        run: npm install --no-save wrangler@latest
+
       - name: Publish to Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist --project-name=unconscious-atlas
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npx wrangler pages deploy dist --project-name=unconscious-atlas --branch=main
