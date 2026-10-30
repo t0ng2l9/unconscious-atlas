@@ -93,53 +93,55 @@ docs/shots/            主要页面与交互截图
 
 ## 部署到公网（Cloudflare Pages）
 
-这是纯静态站点，推荐 **GitHub 仓库 + Cloudflare Pages** 自动部署：推代码即上线，免费，稳定且国内可访问。
+线上地址：**https://unconscious-atlas.pages.dev**
 
-### 1. 推送到 GitHub
+采用 **GitHub Actions 构建 + wrangler 发布**：每次 push 到 `main` 都会自动构建并上线，无需手动上传。
 
-```bash
-cd unconscious-atlas
-git add -A
-git commit -m "无意识图谱：初版"
-# 在 github.com 上新建一个空仓库（建议私有），不要勾选 README/License
-git remote add origin https://github.com/<你的用户名>/unconscious-atlas.git
-git push -u origin main
+### 当前工作流
+
+`.github/workflows/deploy.yml` 做四件事：
+
+1. `pnpm install --frozen-lockfile`
+2. `pnpm build`（产出 `dist/`）
+3. `pnpm dlx wrangler@latest pages deploy dist --project-name=unconscious-atlas --branch=main`
+
+依赖两个 GitHub 仓库 Secret（Settings → Secrets and variables → Actions）：
+
+| Secret | 说明 |
+|---|---|
+| `CLOUDFLARE_API_TOKEN` | Cloudflare API Token，模板选 **Edit Cloudflare Workers** |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare 账号 ID（Workers & Pages 页面右侧） |
+
+### 为什么不用 wrangler-action
+
+`cloudflare/wrangler-action@v3` 会调用它自带的 pnpm 二进制来装 wrangler，和 `pnpm/action-setup` 安装的 pnpm 冲突，报：
+
+```
+Error: The process '/home/runner/setup-pnpm/node_modules/.bin/pnpm' failed with exit code 1
 ```
 
-首次 push 会要求登录；推荐用 GitHub 的 Personal Access Token 当密码，或在 GitHub Desktop 里操作。
+所以改为 `pnpm dlx wrangler` 直接用项目环境里的 pnpm 执行。另外 `package.json` 里原本的 `devEngines` 会强制校验包管理器，用 npm 安装时同样报 `EBADENGINE`，已删除，只保留 `packageManager` 字段。
 
-### 2. 在 Cloudflare Pages 创建项目
+### 日常更新
 
-1. 打开 [dash.cloudflare.com](https://dash.cloudflare.com) → 左侧 **Workers & Pages** → **Create** → **Pages** → **Connect to Git**
-2. 授权 GitHub，选择刚建的 `unconscious-atlas` 仓库
-3. 填构建配置：
+```bash
+git add -A
+git commit -m "更新说明"
+git push
+```
 
-   | 字段 | 值 |
-   |---|---|
-   | Framework preset | None |
-   | Build command | `pnpm build` |
-   | Build output directory | `dist` |
-   | 环境变量 `NODE_VERSION` | `22` |
+推送后约 1–2 分钟自动上线，进度和日志见仓库的 **Actions** 页。历史版本可在 Cloudflare 的 **Deployments** 里回滚。
 
-4. 点 **Save and Deploy**，一两分钟后就得到 `https://unconscious-atlas-xxx.pages.dev` 这样的网址。
+### 路由
 
-> 仓库里的 `pnpm-lock.yaml` 会让 Cloudflare 自动用 pnpm，无需额外配置。
-
-### 3. 关于路由（已经处理好了）
-
-站点用的是 `BrowserRouter`，直接访问 `/archive/dream` 这类深层链接时，静态托管需要把未知路径回退到 `index.html`。仓库里的 `public/_redirects` 已写入规则，构建时会复制进 `dist/`，Cloudflare Pages 会自动识别：
+站点使用 `BrowserRouter`，`public/_redirects` 负责把未知路径回退到 `index.html`（构建时复制进 `dist/`）：
 
 ```
 /*    /index.html   200
 ```
 
-`vite.config.ts` 的 `base` 也已从 `'./'` 改为 `'/'`——用相对路径会导致深层链接下的 JS/CSS 加载失败。
+`vite.config.ts` 的 `base` 必须是 `'/'`；用相对路径会让深层链接下的 JS/CSS 加载失败。
 
-### 4. 以后更新
+### 备选平台
 
-改完代码 `git add -A && git commit -m "..." && git push`，Cloudflare 会自动重新构建并发布。在 Pages 项目的 **Deployments** 里能看到每次部署记录，也能一键回滚。
-
-### 备选方案
-
-- **Vercel / Netlify**：同样连 GitHub，构建命令和输出目录一致；Netlify 需要在根目录加一个 `netlify.toml` 写 `[[redirects]]` 规则，Vercel 需要在根目录放 `vercel.json` 写 rewrites。需要的话我可以补上。
-- **不想连 GitHub**：本地装 `wrangler` 后执行 `npx wrangler pages deploy dist` 也能直接上传，但每次都要手动跑。
+仓库已包含 `netlify.toml` 与 `vercel.json`，直接导入仓库即可部署，构建命令均为 `pnpm build`，输出目录 `dist`。
