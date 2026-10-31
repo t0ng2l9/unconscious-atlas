@@ -1,11 +1,21 @@
+import { useMemo } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { getEssay, essays } from '../data/essays'
 import { getConcept, lineMeta } from '../data/concepts'
 import { Label } from '../components/primitives'
+import CrossLinked from '../components/CrossLinked'
+import { suppressionPlan } from '../lib/linkify'
 
 export default function EssayPage() {
   const { slug } = useParams()
   const essay = slug ? getEssay(slug) : undefined
+
+  // one link per term per article: plan the whole body up front so the same
+  // word is not highlighted in every other paragraph
+  const plan = useMemo(() => {
+    if (!essay) return []
+    return suppressionPlan([essay.lead, ...essay.sections.flatMap((s) => s.paragraphs)])
+  }, [essay])
 
   if (!essay) {
     return (
@@ -94,11 +104,17 @@ export default function EssayPage() {
                   {s.heading}
                 </h2>
               )}
-              {s.paragraphs.map((p, j) => (
-                <p key={j} className="mt-5 leading-[1.95] text-ink/90">
-                  {p}
-                </p>
-              ))}
+              {s.paragraphs.map((p, j) => {
+                const idx = 1 + essay.sections.slice(0, i).reduce((n, sec) => n + sec.paragraphs.length, 0) + j
+                return (
+                  <CrossLinked
+                    key={j}
+                    text={p}
+                    suppress={plan[idx]}
+                    className="mt-5 leading-[1.95] text-ink/90"
+                  />
+                )
+              })}
               {s.pull && (
                 <blockquote className="my-10 grid grid-cols-[auto_1fr] gap-5 border-y border-line py-6">
                   <span className="font-serif-en text-4xl leading-none italic text-crimson" aria-hidden="true">

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { glossary } from '../data/glossary'
 import { lineMeta, getConcept } from '../data/concepts'
 import { Label } from '../components/primitives'
@@ -14,8 +14,19 @@ const LINE_FILTERS = [
 type LineKey = (typeof LINE_FILTERS)[number]['key']
 
 export default function Glossary() {
-  const [q, setQ] = useState('')
+  // ?q= arrives from inline cross-references in essays, so the search box has
+  // to start with that value rather than always empty.
+  const [params, setParams] = useSearchParams()
+  const [q, setQ] = useState(() => params.get('q') ?? '')
   const [line, setLine] = useState<LineKey>('all')
+
+  const updateQuery = (value: string) => {
+    setQ(value)
+    const next = new URLSearchParams(params)
+    if (value) next.set('q', value)
+    else next.delete('q')
+    setParams(next, { replace: true })
+  }
 
   const shown = useMemo(() => {
     const needle = q.trim().toLowerCase()
@@ -60,7 +71,7 @@ export default function Glossary() {
             <span className="label-mono text-mute-soft">检索</span>
             <input
               value={q}
-              onChange={(e) => setQ(e.target.value)}
+              onChange={(e) => updateQuery(e.target.value)}
               placeholder="输入术语、释义或拉丁文…"
               className="w-full bg-transparent py-1 text-sm text-ink placeholder:text-mute-soft focus:outline-none"
               aria-label="检索术语"
@@ -68,7 +79,7 @@ export default function Glossary() {
             {q && (
               <button
                 type="button"
-                onClick={() => setQ('')}
+                onClick={() => updateQuery('')}
                 className="label-mono text-mute-soft hover:text-crimson"
               >
                 清除
@@ -108,7 +119,7 @@ export default function Glossary() {
             <button
               type="button"
               onClick={() => {
-                setQ('')
+                updateQuery('')
                 setLine('all')
               }}
               className="mt-6 border border-ink px-5 py-2 text-sm text-ink transition-colors hover:bg-ink hover:text-paper active:translate-y-px"

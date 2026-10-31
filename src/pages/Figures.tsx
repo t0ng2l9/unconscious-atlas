@@ -1,8 +1,10 @@
-import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useMemo, useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import { figures, eraLabel, type Figure, type Era } from '../data/figures'
 import { lineMeta, getConcept } from '../data/concepts'
 import { Label } from '../components/primitives'
+import FigureRelations from '../components/FigureRelations'
+import RelationMap from '../components/RelationMap'
 
 const LINE_TABS = [
   { key: 'all', label: '全部' },
@@ -13,10 +15,32 @@ const LINE_TABS = [
 
 const ERA_ORDER: Era[] = ['classical', 'interwar', 'structural', 'postwar', 'contemporary']
 
+/** edge cases where the id in the URL is the person's slug */
+const profiled = new Set(figures.map((f) => f.id))
+
 export default function Figures() {
   const [line, setLine] = useState<(typeof LINE_TABS)[number]['key']>('all')
   const [era, setEra] = useState<Era | 'all'>('all')
   const [open, setOpen] = useState<string | null>(null)
+  const [center, setCenter] = useState<string>(figures[0].id)
+  const { hash } = useLocation()
+
+  // /figures#adorno arrives from a cross-reference: clear filters, expand
+  // that card, and scroll it into view once
+  useEffect(() => {
+    const id = hash.replace(/^#/, '')
+    if (!id) return
+    if (profiled.has(id)) {
+      setLine('all')
+      setEra('all')
+      setOpen(id)
+      setCenter(id)
+      const t = window.setTimeout(() => {
+        document.getElementById(`figure-${id}`)?.scrollIntoView({ block: 'start', behavior: 'smooth' })
+      }, 120)
+      return () => window.clearTimeout(t)
+    }
+  }, [hash])
 
   const shown = useMemo(
     () =>
@@ -107,8 +131,65 @@ export default function Figures() {
         当前显示 {shown.length} 位人物。
       </p>
 
+      {/* ================= 关系图 ================= */}
+      <section className="border-b border-line py-12">
+        <div className="grid gap-8 md:grid-cols-[7rem_1fr]">
+          <div className="pt-1">
+            <Label>关系网络</Label>
+          </div>
+          <div className="min-w-0">
+            <h2 className="font-display text-2xl leading-snug tracking-tight text-ink [text-wrap:balance] md:text-3xl">
+              这张图里没有一个人是孤单的
+            </h2>
+            <p className="mt-3 max-w-[62ch] leading-relaxed text-mute [text-wrap:pretty]">
+              每位人物的对话记录，都被还原成一张有方向的网：实线是继承，虚线是对抗，点线是影响。弗洛伊德站在中心，不是因为他重要，而是因为几乎所有人都必须先绕开他——或者走向他。
+            </p>
+
+            <div className="mt-8 border border-line bg-[color-mix(in_srgb,var(--color-paper)_62%,white)] px-2 py-4 md:px-6 md:py-6">
+              <RelationMap />
+            </div>
+
+            <div className="mt-10 grid gap-8 border-t border-line-soft pt-8 md:grid-cols-[13rem_1fr] md:gap-10">
+              <div>
+                <Label>单个人物</Label>
+                <p className="mt-3 text-sm leading-relaxed text-mute">
+                  选择一个人，看他/她走向了谁、又被谁走向。
+                </p>
+                <ul className="mt-4 flex max-h-[19rem] flex-col gap-0.5 overflow-y-auto pr-2">
+                  {figures.map((f) => (
+                    <li key={f.id}>
+                      <button
+                        type="button"
+                        onClick={() => setCenter(f.id)}
+                        aria-pressed={center === f.id}
+                        className={`flex w-full items-baseline justify-between gap-3 border-l py-1 pl-3 text-left text-sm transition-colors ${
+                          center === f.id
+                            ? 'border-crimson text-ink'
+                            : 'border-transparent text-mute hover:border-line hover:text-ink'
+                        }`}
+                      >
+                        <span>{f.name}</span>
+                        <span className="font-mono text-[0.65rem] text-mute-soft">{f.years.split('–')[0]}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="min-w-0 border border-line bg-[color-mix(in_srgb,var(--color-paper)_62%,white)] px-2 py-4 md:px-5">
+                <FigureRelations id={center} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* portrait list */}
       <section className="py-8">
+        <div className="mb-8 flex flex-wrap items-baseline justify-between gap-3 border-b border-line pb-3">
+          <h2 className="font-display text-2xl tracking-tight text-ink">人物条目</h2>
+          <span className="font-mono text-xs text-mute-soft">{shown.length} / {figures.length}</span>
+        </div>
         {shown.length === 0 ? (
           <div className="grid place-items-center border border-dashed border-line px-6 py-20 text-center">
             <p className="font-display text-xl text-ink">这个位置暂时没有人</p>
@@ -117,7 +198,7 @@ export default function Figures() {
         ) : (
           <ul key={`${line}-${era}`} className="grid gap-px bg-line md:grid-cols-2">
             {shown.map((f, i) => (
-              <li key={f.id} className="bg-paper">
+              <li key={f.id} id={`figure-${f.id}`} className="scroll-mt-24 bg-paper">
                 <article
                   className="cascade group flex h-full flex-col p-6 md:p-8"
                   style={{ '--index': i } as React.CSSProperties}
